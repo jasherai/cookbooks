@@ -26,7 +26,8 @@ define :runit_service, :directory => nil, :only_if => false, :finish_script => f
 
   sv_dir_name = "#{params[:directory]}/#{params[:name]}"
   service_dir_name = "#{params[:active_directory]}/#{params[:name]}"
-  params[:options].merge!(:env_dir => "#{sv_dir_name}/env") unless params[:env].empty?
+  #params[:options] = Hash.new(:env_dir => "#{sv_dir_name}/env").merge!(params[:options]) unless params[:env].empty?
+  params[:env_dir] = "#{sv_dir_name}/env" unless params[:env].empty?
 
   directory sv_dir_name do
     owner params[:owner]
@@ -56,7 +57,10 @@ define :runit_service, :directory => nil, :only_if => false, :finish_script => f
     source "sv-#{params[:template_name]}-run.erb"
     cookbook params[:cookbook] if params[:cookbook]
     if params[:options].respond_to?(:has_key?)
-      variables :options => params[:options]
+      variables ({
+        :options => params[:options],
+        :env_dir => params[:env_dir]
+      })
     end
   end
 
